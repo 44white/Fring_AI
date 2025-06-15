@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>농작물 챗봇</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; }
+        #chatbox { border: 1px solid #ccc; height: 400px; overflow-y: scroll; padding: 10px; margin-bottom: 10px; }
+        #userInput { width: 80%; padding: 8px; }
+        #sendBtn { padding: 8px; }
+    </style>
+</head>
+<body>
+    <h1>농작물 AI 챗봇</h1>
+    <p>무엇이 궁금하신가요? (예: 감자 보관법 알려줘)</p>
+    <div id="chatbox"></div>
+    <form id="chatForm">
+        <input type="text" id="userInput" placeholder="메시지를 입력하세요...">
+        <button type="submit" id="sendBtn">전송</button>
+    </form>
+
+    <script>
+        const chatForm = document.getElementById('chatForm');
+        const userInput = document.getElementById('userInput');
+        const chatbox = document.getElementById('chatbox');
+
+        chatForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const message = userInput.value;
+            if (!message) return;
+
+            // 사용자 메시지 표시
+            chatbox.innerHTML += `<p><strong>나:</strong> ${message}</p>`;
+            userInput.value = '';
+
+            // 서버에 메시지 전송 및 답변 받기
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ 'message': message })
+            });
+            
+            const botResponse = await response.text();
+            // 챗봇 답변 표시
+            chatbox.innerHTML += `<p><strong>챗봇:</strong> ${botResponse.replace(/\n/g, '<br>')}</p>`;
+            chatbox.scrollTop = chatbox.scrollHeight; // 스크롤을 맨 아래로
+        });
+    </script>
+</body>
+</html>
